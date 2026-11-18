@@ -1,0 +1,8 @@
+[files]
+"../scripts/1-lab.py" = "./labs/1-lab.py"
+"../scripts/2-lab.py" = "./labs/2-lab.py"
+"../scripts/3-lab.py" = "./labs/3-lab.py"
+"../scripts/4-lab.py" = "./labs/4-lab.py"
+"../scripts/7-lab.py" = "./labs/7-lab.py"
+"../scripts/8-lab.py" = "./labs/8-lab.py"
+"./showcase.py" = "./showcase.py"

@@ -127,3 +127,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# GitHub Pages showcase, assembled locally like the pages workflow does
+_site/

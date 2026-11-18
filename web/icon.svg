@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 66 66">
+  <!-- Sorted bars with a swap arrow over the last two, the step a sort makes, in the showcase's colours -->
+  <g stroke-width="2.6" stroke-linejoin="round">
+    <rect x="5.5" y="40" width="10" height="16" rx="2.5" fill="#d8ecfb" stroke="#4a90c8"/>
+    <rect x="19.5" y="31" width="10" height="25" rx="2.5" fill="#d8ecfb" stroke="#4a90c8"/>
+    <rect x="33.5" y="23" width="10" height="33" rx="2.5" fill="#fbf1cc" stroke="#b8971b"/>
+    <rect x="47.5" y="13" width="10" height="43" rx="2.5" fill="#fbf1cc" stroke="#b8971b"/>
+  </g>
+  <path d="M4 60h56" stroke="#3557d6" stroke-width="3" stroke-linecap="round"/>
+  <g fill="none" stroke="#3557d6" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M38.5 16c0-7 4-10 9-10"/>
+    <path d="M44 3l3.5 3-3.5 3"/>
+  </g>
+  <g stroke="#8a6d0b" stroke-width="2.6" stroke-linecap="round">
+    <path d="M10.5 46v4M24.5 39v4M38.5 31v4M52.5 22v4"/>
+  </g>
+</svg>
