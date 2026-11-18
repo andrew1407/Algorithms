@@ -39,7 +39,9 @@ class Graph:
         p = v[i]
         v[i] = v[u]
         v[u] = p
-        if v in w: continue
+        if v in w:
+          v = V.copy()
+          continue
         w.append(v)
         v = V.copy()
     #weight ways

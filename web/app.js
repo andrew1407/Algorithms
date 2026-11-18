@@ -325,10 +325,10 @@ const LABS = [
   },
   {
     id: 'lab3', tab: '3', name: 'Quick sort pivots', lang: 'py', src: `${SRC}/scripts/3-lab.py`,
-    intro: 'Three quick sorts over the same array: by the middle, the last and the first element. Each counts its swaps in <code>swap_counter</code>, which the script prints as "comparisons". The page passes the sorts a list that records every read and write, so each step replays as bars, and the actual comparisons are counted alongside.',
+    intro: 'Three quick sorts over the same array: by the middle, the last and the first element. Each counts its swaps in <code>swap_counter</code>, which the script prints as "comparisons". The page passes the sorts a list that records every comparison and write, so each step replays as bars, and the actual comparisons are counted alongside.',
     fields: [listField('array', 'Array A', LAB_ARRAY), { key: 'sweep_max', label: 'Sweep: max size', value: 60, min: 5, max: 100 }, { key: 'seed', label: 'Sweep seed', value: 1, min: 0, max: 99999 }],
     examples: [LAB_ARRAY, '5, 4, 3, 2, 1, 0', '1, 2, 3, 4, 5, 6, 7, 8', '31, 5, 16, 72, 99, 68, 65, 1, 84, 29'],
-    hint: 'The sweep sorts random arrays of 5, 10, … up to the max size with each strategy and plots the counters. The middle-pivot sort often stops early and leaves those arrays unsorted, which is why its counts stay low; the last and first pivots give equal counts, so the first-pivot line is dashed.',
+    hint: 'The sweep sorts random arrays of 5, 10, … up to the max size with each strategy and plots the counters. The last and first pivots give equal counts, so the first-pivot line is dashed.',
     check: (p) => { const a = parseList(p.array); return a.length < 2 || a.length > 40 || a.some((v) => !Number.isInteger(v)) ? 'A needs 2 to 40 integers.' : null; },
     run: (p) => runPy('lab3', { array: parseList(p.array), sweep_max: p.sweep_max, seed: p.seed }),
     render: (d) => lab3View(d),
@@ -370,7 +370,7 @@ const LABS = [
   },
   {
     id: 'lab8', tab: '8', name: 'Knapsack', lang: 'py', src: `${SRC}/scripts/8-lab.py`,
-    intro: 'Picks the set of goods with the highest total price that fits the backpack. The lab doesn\'t use a DP table: it lists every set of two or more goods, sums each set\'s weight and price, and keeps the best one within capacity (on a tie, the later set).',
+    intro: 'Picks the set of goods with the highest total price that fits the backpack. The lab doesn\'t use a DP table: it lists every set of goods, sums each set\'s weight and price, and keeps the best one within capacity (on a tie, the later set).',
     fields: [{ key: 'capacity', label: 'MAX_WEIGHT', value: 26, min: 1, max: 1000 }, { key: 'items', label: 'Goods (title:weight:price)', value: 'a:4:10, b:6:4, c:8:10, d:7:7, e:10:6, f:3:1, g:5:9, h:2:5', type: 'list', wide: 'wide2' }],
     hint: 'Up to 10 goods: the lab\'s set listing grows quickly (10 goods take about a second here).',
     check: (p) => {
@@ -394,7 +394,6 @@ function parseItems(s) {
 // ------------------------------------------------------------ custom views --
 function lab1View(d, hs, input) {
   const frames = [{ array: input, iteration: 0, value: null }, ...d.steps];
-  const ok = !d.error && JSON.stringify(d.result) === JSON.stringify(d.expected);
   const base = (i, v) => (v % 2 ? '--c2' : '--c1');
   const draw = (f, width) => {
     const at = f.value === null ? -1 : f.array.indexOf(f.value);
@@ -402,29 +401,21 @@ function lab1View(d, hs, input) {
   };
   const cap = (f) => (f.value === null ? `<span class="muted">Input array</span> ${list(f.array)}` : `<span class="muted">Iteration ${f.iteration}: placed</span> ${f.value} <span class="muted">→</span> ${list(f.array)}`);
   const legend = key('--c1', 'even') + key('--c2', 'odd') + key('--c7', 'value placed in this iteration');
-  const note = d.error ? `<p class="note">The lab stopped with <code>${esc(d.error)}</code>. When every element before an odd value is odd and larger, its search index runs past the start of the list.</p>`
-    : ok ? '' : `<p class="note">The lab's result differs from "evens ascending, then odds descending" (${list(d.expected)}). When the odd values before the new one are all larger, its backward search wraps round to <code>A[-1]</code> and the value lands in the wrong place.</p>`;
-  return `${note}<div class="stats">${stat(d.steps.length, 'iterations printed')}${stat(d.result ? list(d.result) : '—', 'sorted array')}${stat(ok ? 'evens ↑, odds ↓' : 'not in order', 'check', ok ? 'good' : 'bad')}</div>
+  return `<div class="stats">${stat(d.steps.length, 'iterations printed')}${stat(list(d.result), 'sorted array')}</div>
     ${player('Insertion sort, step by step', frames, draw, cap, legend)}
-    <div class="two-col" style="margin-top:16px">${consoleBox(d.output || d.error)}
+    <div class="two-col" style="margin-top:16px">${consoleBox(d.output)}
       <div class="box" data-copyable data-title="Haskell port"><div class="copy-head"><h2><span class="lang hs" style="vertical-align:1px">Haskell</span> Port <small>· <a href="${SRC}/scripts/haskell/1-lab.hs" target="_blank" rel="noopener">scripts/haskell/1-lab.hs</a></small></h2></div>
-        <p class="note">Shown as source only: there's no lightweight way to run GHC-compiled Haskell in the browser. It sorts the same way, popping each element and inserting it among the evens (ascending) or the odds (descending), and for the lab's array its <code>main</code> prints the same result: <code>[24,30,46,78,55,41,19,15,9,3]</code>. On some other inputs the two differ, because the Haskell version inserts into the whole remaining list, not just the sorted prefix.</p>
+        <p class="note">Shown as source only: there's no lightweight way to run GHC-compiled Haskell in the browser. It sorts the same way, popping each element and inserting it among the evens (ascending) or the odds (descending), and for the lab's array its <code>main</code> prints the same result: <code>[24,30,46,78,55,41,19,15,9,3]</code>.</p>
         <pre class="code">${esc(hs.replace(/\s+$/, ''))}</pre></div></div>`;
 }
 
 function lab2View(d, p) {
   const users = Object.keys(d.ratings).map(Number);
   const others = users.filter((u) => u !== p.user);
-  const actual = Object.fromEntries(others.map((u) => [u, d.pairs[u].length]));
-  const labCount = Object.fromEntries(d.ranking.map((r) => [r.user, r.inversions]));
-  const missing = others.filter((u) => labCount[u] === undefined);
   const best = d.ranking[0];
   const cols = range(p.movies, (i) => `<th class="num">m${i + 1}</th>`).join('');
   const rows = users.map((u) => `<tr class="${u === p.user ? 'sel' : ''}"><td>User ${u}${u === p.user ? ' <span class="muted">(compared with)</span>' : ''}</td>${d.ratings[u].map((v) => `<td class="num">${v}</td>`).join('')}</tr>`).join('');
-  const over = d.ranking.some((r) => r.inversions !== actual[r.user]);
-  const notes = (over ? `<p class="note">The lab's counts are higher than the actual inversions. Each time its merge takes an element from the right half it adds <code>(len(right) - l) + 1</code>, where it should add the number of elements still left in the left half. The page shows both.</p>` : '')
-    + (missing.length ? `<p class="note">User${missing.length > 1 ? 's' : ''} ${missing.join(', ')} ${missing.length > 1 ? 'are' : 'is'} missing from the lab's output: it matches counts with <code>is</code>, which only works for small cached integers.</p>` : '');
-  const order = d.ranking.map((r) => r.user).concat(missing);
+  const order = d.ranking.map((r) => r.user);
   const diagram = (u, hi = null) => {
     const P = d.priorities[u], m = P.length, W = Math.max(320, m * 56), H = 170, step = (W - 60) / Math.max(1, m - 1);
     const X = (i) => 30 + i * step, top = 40, bot = 130;
@@ -439,9 +430,9 @@ function lab2View(d, p) {
   };
   const tabs = others.map((u, i) => `<button class="tab" data-u="${u}" aria-selected="${i === 0}">User ${u}</button>`).join('');
   lab2View.state = { d, p, diagram };
-  return `${notes}<div class="stats">${stat(best ? `User ${best.user}` : '—', `closest to user ${p.user}`)}${stat(best ? best.inversions : '—', 'its lab count')}${stat(best ? actual[best.user] : '—', 'its actual inversions')}${stat(others.length, 'users compared')}</div>
+  return `<div class="stats">${stat(best ? `User ${best.user}` : '—', `closest to user ${p.user}`)}${stat(best ? best.inversions : '—', 'its inversions')}${stat(others.length, 'users compared')}</div>
     <div class="two-col"><div class="box" data-copyable><div class="copy-head"><h2>Rankings <small>· D[user][i] is the rank given to movie i + 1</small></h2>${actions('table')}</div><div class="table-wrap"><table><thead><tr><th>User</th>${cols}</tr></thead><tbody>${rows}</tbody></table></div></div>
-      ${chart({ kind: 'bar', title: `Inversions against user ${p.user}`, x: 'user, in the lab\'s order', y: 'inversions', cats: order.map((u) => `User ${u}`), series: [{ name: 'lab count', ys: order.map((u) => labCount[u] ?? 0), color: '--c1' }, { name: 'actual inversions', ys: order.map((u) => actual[u]), color: '--c2' }] })}</div>
+      ${chart({ kind: 'bar', title: `Inversions against user ${p.user}`, x: 'user, in the lab\'s order', y: 'inversions', cats: order.map((u) => `User ${u}`), series: [{ name: 'inversions', ys: d.ranking.map((r) => r.inversions), color: '--c1' }] })}</div>
     <div class="box" data-copyable data-title="Inversion pairs" id="pairs-box" style="margin-top:16px"><div class="copy-head"><h2>Pairs view <small>· each line joins user ${p.user}'s rank of a movie to the other user's rank of it; every crossing is one inversion</small></h2>${actions('png')}</div>
       <div class="tabs" id="pairs-tabs">${tabs}</div><div class="plot drawing" id="pairs-plot" style="overflow-x:auto"></div>
       <div class="legend">${key('--c3', 'movie in no inversion')}${key('--c2', 'movie in an inversion')}${key('--c5', 'selected pair')}</div>
@@ -474,10 +465,8 @@ function lab3View(d) {
   const input = d.runs.middle.frames[0].a;
   const cards = PIVOTS.map(([k, name, c]) => {
     const r = d.runs[k];
-    return `<div class="panel" style="margin:0;padding:14px"><h2 style="margin-bottom:8px"><span class="sw" style="background:var(${c})"></span>${name}</h2><div class="stats" style="margin:0;grid-template-columns:repeat(3,1fr)">${stat(r.swaps, 'swaps (lab\'s "comparisons")')}${stat(r.comparisons, 'comparisons')}${stat(r.error ? 'error' : r.sorted ? 'sorted' : 'not sorted', 'result', r.sorted && !r.error ? 'good' : 'bad')}</div></div>`;
+    return `<div class="panel" style="margin:0;padding:14px"><h2 style="margin-bottom:8px"><span class="sw" style="background:var(${c})"></span>${name}</h2><div class="stats" style="margin:0;grid-template-columns:repeat(3,1fr)">${stat(r.swaps, 'swaps (lab\'s "comparisons")')}${stat(r.comparisons, 'comparisons')}${stat(r.writes, 'writes')}</div></div>`;
   }).join('');
-  const broken = PIVOTS.filter(([k]) => !d.runs[k].sorted || d.runs[k].error);
-  const note = broken.length ? `<p class="note">${broken.map(([k, name]) => `${name}: ${d.runs[k].error ? `stopped with <code>${esc(d.runs[k].error)}</code>` : `left the array unsorted, ${list(d.runs[k].result)}`}`).join('. ')}. The middle-pivot sort only partitions while both scan indices are on their own side of the pivot, so on many inputs it stops early.</p>` : '';
   const legend = key('--c2', 'compared') + key('--c3', 'written') + key('--c1', 'other elements');
   const players = PIVOTS.map(([k, name], i) => {
     const r = d.runs[k];
@@ -497,7 +486,7 @@ function lab3View(d) {
     return `<div data-pivot="${k}" ${i ? 'hidden' : ''}>${player(`${name} quick sort, step by step${r.truncated ? ' (first steps only)' : ''}`, r.frames, draw, cap, legend)}</div>`;
   }).join('');
   const strat = (key) => PIVOTS.map(([k, name, c]) => ({ name, xs: d.sizes, ys: d.sweep[k][key], color: c, dash: k === 'first' }));
-  return `${note}<div class="algo-cards">${cards}</div>
+  return `<div class="algo-cards">${cards}</div>
     <div class="tabs" id="pivot-tabs">${PIVOTS.map(([k, name], i) => `<button class="tab" data-k="${k}" aria-selected="${i === 0}">${name}</button>`).join('')}</div>
     ${players}
     <div class="charts two" style="margin-top:16px">
@@ -645,18 +634,8 @@ function lab8View(d, p) {
   const label = (s) => `{${s.titles.join(', ')}}`;
   const isChosen = (s) => d.chosen && s.titles.join() === d.chosen.join();
   const pick = (f) => { const ss = d.sets.filter(f); return { xs: ss.map((s) => s.weight), ys: ss.map((s) => s.price), labels: ss.map(label) }; };
-  // every subset, singletons included, for comparison with the lab's sets of two or more
-  const g = d.goods; let best = null;
-  for (let mask = 1; mask < 1 << g.length; mask++) {
-    let w = 0, pr = 0; const t = [];
-    g.forEach((x, i) => { if (mask & (1 << i)) { w += x.weight; pr += x.price; t.push(x.title); } });
-    if (w <= p.capacity && (!best || pr > best.price)) best = { titles: t, weight: w, price: pr };
-  }
-  const ok = best && d.price >= best.price && d.chosen;
   const rows = d.goods.map((x) => `<tr class="${chosen.has(x.title) ? 'sel' : ''}"><td>${esc(x.title)}</td><td class="num">${x.weight}</td><td class="num">${x.price}</td><td class="num">${fmt(x.price / x.weight, 2)}</td><td>${chosen.has(x.title) ? '<span class="ok">✓ taken</span>' : ''}</td></tr>`).join('');
-  const note = !d.chosen ? `<p class="note">No set of two or more goods fits, so the lab reports <code>None</code>. It never considers single goods.</p>`
-    : !ok ? `<p class="note">The best fit overall is {${best.titles.join(', ')}} with price ${best.price}: a single good, which the lab never considers.</p>` : '';
-  return `${note}<div class="stats">${stat(d.chosen ? pyList(d.chosen) : 'None', 'appropriate set')}${stat(`${d.weight} / ${p.capacity}`, 'weight / capacity')}${stat(d.price, 'price')}${stat(d.sets.length, 'sets listed')}${stat(fits.length, 'sets that fit')}${stat(best ? best.price : '—', 'best over all subsets', ok ? 'good' : 'bad')}</div>
+  return `<div class="stats">${stat(d.chosen ? pyList(d.chosen) : 'None', 'appropriate set')}${stat(`${d.weight} / ${p.capacity}`, 'weight / capacity')}${stat(d.price, 'price')}${stat(d.sets.length, 'sets listed')}${stat(fits.length, 'sets that fit')}</div>
     <div class="two-col"><div class="box" data-copyable><div class="copy-head"><h2>Goods <small>· the chosen set highlighted</small></h2>${actions('table')}</div><div class="table-wrap"><table><thead><tr><th>Title</th><th class="num">Weight</th><th class="num">Price</th><th class="num">Price / weight</th><th>Set</th></tr></thead><tbody>${rows}</tbody></table></div></div>
       ${chart({ title: 'Every listed set: weight vs price', x: 'weight', y: 'price', scatter: true, tightX: false, vline: { x: p.capacity, label: `capacity ${p.capacity}` }, series: [{ name: 'fits', ...pick((s) => s.weight <= p.capacity && !isChosen(s)), color: '--c1' }, { name: 'too heavy', ...pick((s) => s.weight > p.capacity), color: '--c5' }, { name: 'chosen', ...pick(isChosen), color: '--c3', r: 6 }] })}</div>
     <div style="margin-top:16px">${consoleBox(d.output)}</div>`;

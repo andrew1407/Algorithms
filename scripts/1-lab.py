@@ -12,13 +12,13 @@ while index != (len(A) - 1):
   #for odd numbers
   if A[index] % 2:
     i = index - 1
-    while A[i] % 2:                  #if value <= A[i]
+    while i >= 0 and A[i] % 2:       #if value <= A[i]
       if A[index] <= A[i]:            #position searching
         A.insert(i + 1, A[index])
         A.pop(index + 1)
         break
       i -= 1
-    if not A[i] % 2:                  #if value is maximum
+    if i < 0 or not A[i] % 2:         #if value is maximum
       A.insert(i + 1, A[index])
       A.pop(index + 1)
       

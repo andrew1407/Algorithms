@@ -20,41 +20,27 @@ def sort_middle(_arr, _pivot, _min, _max):
   #sorting
   first = _min
   last = _max
-  while _min < _pivot and \
-    _max > _pivot:
-      while _min < _pivot and \
-       _arr[_min] < _arr[_pivot]:
+  pivot_value = _arr[_pivot]      #the pivot moves while swapping, so keep its value
+  while _min <= _max:
+      while _arr[_min] < pivot_value:
           _min += 1
-      while _max > _pivot and \
-       _arr[_max] >= _arr[_pivot]:
+      while _arr[_max] > pivot_value:
           _max -= 1
+      if _min > _max: break
       #elements swapping
-      val = _arr[_min]
-      _arr[_min] = _arr[_max]
-      _arr[_max] = val
-      swap_counter += 1           #counter increasing
+      if _min < _max:
+        val = _arr[_min]
+        _arr[_min] = _arr[_max]
+        _arr[_max] = val
+        swap_counter += 1           #counter increasing
       _min += 1
       _max -= 1
-      if _min < _pivot and \
-       _max > _pivot:
-          continue
-      #pivot swapping
-      if _arr[_pivot] < _arr[_pivot - 1]:
-        val = _arr[_pivot]
-        _arr[_pivot] = _arr[_pivot - 1]
-        _arr[_pivot - 1] = val
-        swap_counter += 1           #counter increasing
-      elif _arr[_pivot] > _arr[_pivot + 1]:
-        val = _arr[_pivot]
-        _arr[_pivot] = _arr[_pivot + 1]
-        _arr[_pivot + 1] = val
-        swap_counter += 1           #counter increasing
-      #recursions
-      _pivot1 = mid(first, _pivot)
-      _pivot2 = mid(_pivot, last)
-      sort_middle(_arr, _pivot1, first, _pivot)
-      sort_middle(_arr, _pivot2, _pivot, last)
-      sort_middle.counter = swap_counter
+  #recursions
+  _pivot1 = mid(first, _max)
+  _pivot2 = mid(_min, last)
+  sort_middle(_arr, _pivot1, first, _max)
+  sort_middle(_arr, _pivot2, _min, last)
+  sort_middle.counter = swap_counter
 
 #[FUNCTION 1] extra
 sort_middle.out = lambda a: print(f"Sorting by the middle element - {a} comparisons:")
@@ -64,7 +50,7 @@ sort_middle.pivot = pivot_mid
 #[FUNCTION 2] sorts by the last element:
 def sort_last(arr, _pivot, _min = None, _max = None):
   global swap_counter
-  if _pivot is left: return
+  if _pivot == left: return
   index = 0
   i = 0
   while i < _pivot:
@@ -98,7 +84,7 @@ sort_last.pivot = pivot_last
 #[FUNCTION 3] sorts by the first element:
 def sort_first(arr, _pivot, _min = None, _max = None):
   global swap_counter
-  if _pivot is right: return
+  if _pivot == right: return
   index = right
   i = right
   while i > _pivot:

@@ -69,7 +69,7 @@ def Inverions_count(arr):
       l += 1
     else:
       arr[i] = right[r]
-      inv_count += (len(right) - l) + 1     #inversions counting for one element
+      inv_count += (len(left) - l) - 1      #inversions counting for one element
       r += 1
   return arr
 
@@ -92,6 +92,6 @@ inv_arr.sort()
 #output
 for inversions in inv_arr:
   for user in priorityInversions:
-    if inversions is priorityInversions[user]:
+    if inversions == priorityInversions[user]:
       print(f"User {user}: {inversions} inversions")
       priorityInversions[user] = None

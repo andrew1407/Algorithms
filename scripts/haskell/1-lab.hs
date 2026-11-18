@@ -45,7 +45,7 @@ insertion_sort index arr
   | otherwise = sort
   where
     (val, rest) = index `pop` arr
-    res = val &> rest
+    res = (val &> take index rest) ++ drop index rest   -- insert into the sorted part only
     sort = insertion_sort (index + 1) res
 
 insertionSort :: (Integral a, Eq a, Ord a, Num a) => [a] -> [a]

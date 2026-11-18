@@ -59,7 +59,7 @@ Python:
 python scripts/1-lab.py
 ```
 
-Labs 2 and 7 read interactively from standard input ([`2-lab.py`](scripts/2-lab.py) prompts for user/movie counts and a user to compare; the rest use built-in sample arrays).
+Lab 2 reads interactively from standard input ([`2-lab.py`](scripts/2-lab.py) prompts for user/movie counts and a user to compare); lab 7 generates random graphs, and the rest use built-in sample data.
 
 JavaScript (Node.js):
 

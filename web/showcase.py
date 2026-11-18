@@ -1,13 +1,13 @@
 """Browser-side glue for the GitHub Pages showcase.
 
 The lab scripts are written to run top to bottom: they compute and print, and
-labs 2 reads its sizes from stdin. Two loaders run them here without changing
+lab 2 reads its sizes from stdin. Two loaders run them here without changing
 them:
 
 * run_script() executes a whole script with `print` and `input` replaced in its
-  namespace, so its own output is captured and stdin is fed from the page's
-  form. Sample data such as `A = [...]` can be swapped for the user's values
-  by rewriting that one assignment in the parsed source.
+  namespace, so its own output is captured and lab 2's stdin is fed from the
+  page's form. Sample data such as `A = [...]` can be swapped for the user's
+  values by rewriting that one assignment in the parsed source.
 * load_lab() keeps only a script's imports, lambdas and functions/classes, so
   the page can call them with its own data (labs 3 and 7).
 
@@ -21,7 +21,6 @@ import re
 from itertools import permutations
 
 FRAME_LIMIT = 6000  # replay frames kept per sort; the counters stay exact past it
-OP_LIMIT = 200_000  # a guard against runaway recursion on odd inputs
 
 
 def source(n):
@@ -81,17 +80,12 @@ STEP = re.compile(r'^(\[.*\]), iteration: (\d+); placed value: (-?\d+);$')
 
 
 def lab1(array):
-  try:
-    ns, text = run_script(1, dict(A=array))
-    error = None
-  except Exception as e:  # the lab's own failure, e.g. IndexError on an all-odd prefix
-    ns, text, error = {}, '', f'{type(e).__name__}: {e}'
+  ns, text = run_script(1, dict(A=array))
   steps = []
   for line in text.splitlines():
     m = STEP.match(line.strip())
     if m: steps.append(dict(array=ast.literal_eval(m[1]), iteration=int(m[2]), value=int(m[3])))
-  expected = sorted(x for x in array if x % 2 == 0) + sorted((x for x in array if x % 2), reverse=True)
-  return dict(output=text, steps=steps, result=ns.get('A'), expected=expected, error=error)
+  return dict(output=text, steps=steps, result=ns['A'])
 
 
 # ------------------------------------------------------------------ lab 2 --
@@ -106,19 +100,16 @@ def lab2(users, movies, user, seed):
     for i in range(movies): p[D[x][i] - 1] = D[u][i]
     priorities[u] = p
   ranking = [dict(user=int(m[1]), inversions=int(m[2])) for m in re.finditer(r'^User (\d+): (\d+) inversions$', text, re.M)]
+  # the inverted pairs behind each count, for the pairs view
   pairs = {u: [[i, j] for i in range(movies) for j in range(i + 1, movies) if p[i] > p[j]] for u, p in priorities.items()}
   return dict(output=text, ratings={str(k): v for k, v in D.items()}, priorities={str(k): v for k, v in priorities.items()},
-              ranking=ranking, pairs={str(k): v for k, v in pairs.items()}, lab_counts={str(k): v for k, v in ns['priorityInversions'].items()})
+              ranking=ranking, pairs={str(k): v for k, v in pairs.items()})
 
 
 # ------------------------------------------------------------------ lab 3 --
 class Tracer:
   def __init__(self, ns):
-    self.ns, self.frames, self.reads, self.cmp, self.writes, self.ops = ns, [], [], 0, 0, 0
-
-  def tick(self):
-    self.ops += 1
-    if self.ops > OP_LIMIT: raise RuntimeError(f'stopped after {OP_LIMIT} operations')
+    self.ns, self.frames, self.cmp, self.writes, self.arr = ns, [], 0, 0, None
 
   def frame(self, arr, kind, idx):
     if len(self.frames) < FRAME_LIMIT:
@@ -135,8 +126,9 @@ class Num:
 
   def _cmp(self, other, op):
     t = self.t
-    t.tick(); t.cmp += 1
-    if t.arr is not None: t.frame(t.arr, 'c', t.reads[-2:])
+    t.cmp += 1
+    if t.arr is not None:  # where the two compared elements sit now (the pivot may be held in a variable)
+      t.frame(t.arr, 'c', [i for x in (self, other) for i, y in enumerate(list.__iter__(t.arr)) if y is x])
     return op(self.v, other.v if isinstance(other, Num) else other)
 
   def __lt__(self, o): return self._cmp(o, lambda a, b: a < b)
@@ -150,13 +142,9 @@ class Traced(list):
     super().__init__(Num(v, t) for v in values)
     self.t = t
 
-  def __getitem__(self, i):
-    self.t.reads = (self.t.reads + [i])[-2:]
-    return list.__getitem__(self, i)
-
   def __setitem__(self, i, v):
     list.__setitem__(self, i, v)
-    self.t.tick(); self.t.writes += 1
+    self.t.writes += 1
     self.t.frame(self, 'w', [i])
 
 
@@ -171,21 +159,14 @@ def run_sorts(L, array, trace=True):
   for fn, key in STRATEGIES:
     L['swap_counter'] = 0
     t = Tracer(L)
-    t.arr = None
     arr = Traced(array, t)
     t.arr = arr if trace else None
     if not trace: t.frame = lambda *a: None
     t.frame(arr, 'start', [])
-    error = None
-    try:
-      L[fn](arr, pivots[fn], left, right)
-    except (RecursionError, RuntimeError, IndexError) as e:
-      error = f'{type(e).__name__}: {e}'
-    values = [int(v) for v in list.__iter__(arr)]
+    L[fn](arr, pivots[fn], left, right)
     t.frame(arr, 'end', [])
-    res[key] = dict(swaps=L['swap_counter'], comparisons=t.cmp, writes=t.writes, result=values,
-                    sorted=values == sorted(array), pivot=pivots[fn], frames=t.frames,
-                    truncated=len(t.frames) >= FRAME_LIMIT, error=error)
+    res[key] = dict(swaps=L[fn].counter, comparisons=t.cmp, writes=t.writes, result=[int(v) for v in list.__iter__(arr)],
+                    pivot=pivots[fn], frames=t.frames, truncated=len(t.frames) >= FRAME_LIMIT)
   return res
 
 

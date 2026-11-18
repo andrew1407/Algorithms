@@ -25,6 +25,7 @@ print("All the things:")
 for i in goods: print(i)
 #sets generation
 setTitles = list()
+for product in goods: setTitles.append([product['title']])   #single things
 for step in range(len(goods) - 1):
   if step:
     for product in goods:
