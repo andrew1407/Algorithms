@@ -23,8 +23,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # No build step: PyScript runs the Python labs and the page runs the JS labs as they are.
-      # Mirror the repo layout so web/pyscript.toml and app.js can load ../scripts/*
+      # No build step: Pyodide runs the Python labs and the page runs the JS labs as they are.
+      # Mirror the repo layout so web/pyodide.toml and app.js can load ../scripts/*
       - name: Assemble site
         run: |
           mkdir -p _site/web

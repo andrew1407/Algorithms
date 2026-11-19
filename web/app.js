@@ -1,5 +1,5 @@
 // Algorithms Labs showcase: lab panels, SVG charts and drawings, and the two runtimes.
-// Python labs call window.pyRun (bridge.py, PyScript), which runs the lab scripts
+// Python labs call window.pyRun (pyworker.js: bridge.py in a Pyodide Web Worker, worker.js), which runs the lab scripts
 // themselves (showcase.py). JavaScript labs fetch their own file from ../scripts/ and
 // run it with a captured console.
 
@@ -33,7 +33,7 @@ const whenPy = () => (pyReady ? Promise.resolve() : new Promise((r) => pyWaiters
 async function runPy(name, params) {
   await whenPy();
   await pause();
-  const res = JSON.parse(window.pyRun(name, JSON.stringify(params)));
+  const res = JSON.parse(await window.pyRun(name, JSON.stringify(params)));
   if (!res.ok) throw new Error(res.error);
   return res.data;
 }
@@ -826,7 +826,11 @@ async function run(lab) {
   const bad = invalid(lab, p);
   if (bad) { out.innerHTML = `<div class="err">${esc(bad)}</div>`; return; }
   st.running = true; st.ran = true;
-  btn.disabled = true; btn.textContent = lab.lang === 'py' && !pyReady ? 'Waiting for Python…' : 'Running…';
+  // Python runs in a worker, so the page stays responsive; show the elapsed time.
+  const t0 = Date.now();
+  const label = () => (lab.lang === 'py' && !pyReady ? 'Waiting for Python…' : `Running… ${Math.floor((Date.now() - t0) / 1000)} s`);
+  btn.disabled = true; btn.textContent = label();
+  const timer = setInterval(() => { btn.textContent = label(); }, 250);
   out.style.opacity = '.45';
   try {
     const data = await lab.run(p);
@@ -838,6 +842,7 @@ async function run(lab) {
     console.error(e);
     out.innerHTML = `<div class="err">${esc(e.message || e)}</div>`;
   } finally {
+    clearInterval(timer);
     st.running = false; btn.disabled = false; btn.textContent = 'Run'; out.style.opacity = '';
   }
 }

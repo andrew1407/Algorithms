@@ -7,8 +7,7 @@
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <script src="theme.js"></script>
   <meta name="description" content="Run the Algorithms labs in your browser: insertion sort, inversion counting, quick sort pivots, running medians, hash tables, a binary search tree, a TSP heuristic and the knapsack problem, from their own Python and JavaScript sources.">
-  <link rel="stylesheet" href="https://pyscript.net/releases/2026.7.3/core.css">
-  <script type="module" src="https://pyscript.net/releases/2026.7.3/core.js"></script>
+  <script type="module" src="./pyworker.js"></script>
   <style>
     :root {
       --bg: #f6f7f9; --panel: #ffffff; --ink: #1b1f24; --muted: #5d6673; --line: #dfe3e8; --grid: #eceff3;
@@ -200,7 +199,7 @@
     <img src="icon.svg" alt="" width="52" height="52">
     <div>
       <h1>Algorithms Labs</h1>
-      <p>The <a href="https://github.com/Andrew1407/Algorithms">Algorithms</a> labs, running in your browser. The Python labs run their own source through PyScript, and the JavaScript labs run their own files.</p>
+      <p>The <a href="https://github.com/Andrew1407/Algorithms">Algorithms</a> labs, running in your browser. The Python labs run their own source through Pyodide, and the JavaScript labs run their own files.</p>
     </div>
     <button class="theme-toggle" data-theme-toggle></button>
   </header>
@@ -220,7 +219,6 @@
   <footer>Each lab runs its own source file in your browser. Random sample data comes from a seed you can change, so a run can be repeated.</footer>
 </div>
 
-<script type="py" src="./bridge.py" config="./pyscript.toml"></script>
 <script type="module" src="./app.js"></script>
 </body>
 </html>

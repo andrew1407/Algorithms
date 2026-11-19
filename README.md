@@ -30,7 +30,7 @@ The scripts live under [`scripts/`](scripts), numbered by lab. Each one implemen
 
 **[Open the labs in the browser](https://andrew1407.github.io/Algorithms/)**. Every lab runs from its own source code, with editable sample data (or a random seed), step-by-step views of the algorithms, and buttons to copy each chart and drawing (PNG or CSV), table and set of results.
 
-- **Python labs (1–4, 7, 8)** run in [PyScript](https://pyscript.net). [`web/showcase.py`](web/showcase.py) runs each script with its `print` and `input` captured, so lab 2's stdin is fed from the page, and its sample array swapped for the one in the form. Labs 3 and 7 have their functions and class called directly. Lab 3's sorts get a list that records each step, so they replay as bars.
+- **Python labs (1–4, 7, 8)** run in [Pyodide](https://pyodide.org), in a Web Worker so the page never freezes. [`web/showcase.py`](web/showcase.py) runs each script with its `print` and `input` captured, so lab 2's stdin is fed from the page, and its sample array swapped for the one in the form. Labs 3 and 7 have their functions and class called directly. Lab 3's sorts get a list that records each step, so they replay as bars.
 - **JavaScript labs (5, 6)** are fetched and run as they are, with a captured `console`. Only their sample-data lines (`S`, `A`, the vertex list) are set from the form.
 - **Haskell port of lab 1** is shown as source next to the Python lab. It isn't run, because there's no lightweight way to run GHC output in the browser.
 
@@ -93,7 +93,7 @@ ghc scripts/haskell/1-lab.hs -o 1-lab && ./1-lab
 │       └── 1-lab.hs    # insertion sort
 ├── web/                # GitHub Pages showcase
 │   ├── index.html, app.js            # page, charts, step views, copy buttons
-│   ├── bridge.py, showcase.py, pyscript.toml   # PyScript glue for the Python labs
+│   ├── pyworker.js, worker.js, bridge.py, showcase.py, pyodide.toml   # Python labs in a Pyodide worker
 │   └── icon.svg        # logo / favicon
 └── .gitignore
 ```
