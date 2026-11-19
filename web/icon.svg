@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" data-badge="1">
   <!-- Sorted bars with a swap arrow over the last two, the step a sort makes, in the showcase's colours, on a round outlined badge -->
-  <circle cx="32" cy="32" r="30.5" fill="#ffffff" stroke="#3557d6" stroke-width="3"/>
-  <svg x="12.5" y="12.5" width="39" height="39" viewBox="-1 -1 66 66">
+  <circle cx="32" cy="32" r="30" fill="#ffffff" stroke="#3557d6" stroke-width="4"/>
+  <svg x="14" y="14" width="36" height="36" viewBox="1.7 1.2 60.6 60.6">
     <g stroke-width="2.6" stroke-linejoin="round">
     <rect x="5.5" y="40" width="10" height="16" rx="2.5" fill="#d8ecfb" stroke="#4a90c8"/>
     <rect x="19.5" y="31" width="10" height="25" rx="2.5" fill="#d8ecfb" stroke="#4a90c8"/>
